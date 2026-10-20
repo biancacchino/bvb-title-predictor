@@ -52,10 +52,3 @@ def load_all(start=2003, end=CURRENT_SEASON):
         print(f'Loading {year}')
         dfs.append(load_season(year))
     return pd.concat(dfs)
-
-load_season(2020)
-load_season(2020)
-
-df = load_all()
-print(len(df))
-print(df.season.nunique())
