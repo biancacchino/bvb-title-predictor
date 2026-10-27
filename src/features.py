@@ -29,16 +29,16 @@ def add_elo(matches):
 
     home_elo_before = []
     away_elo_before = []
-    current_season = None
+    previous_season = None
     first_season = matches.season.min()
     ratings = {team: LEAGUE_AVERAGE for team in set(matches.loc[matches.season == first_season, 'home_team'])}
     for match in matches.itertuples():
-        if match.season != current_season:
+        if match.season != previous_season:
             teams_this_season = set(matches.loc[matches.season == match.season, 'home_team'])
             for team, rating in ratings.items():
                 target = LEAGUE_AVERAGE if team in teams_this_season else SECOND_DIVISION_RATING
                 ratings[team] = target + SUMMER_KEEP * (rating - target)
-            current_season = match.season
+            previous_season = match.season
 
         home_rating = ratings.get(match.home_team, SECOND_DIVISION_RATING)
         away_rating = ratings.get(match.away_team, SECOND_DIVISION_RATING)
