@@ -51,4 +51,6 @@ def load_all(start=2003, end=CURRENT_SEASON):
     for year in range(start, end+1):
         print(f'Loading {year}')
         dfs.append(load_season(year))
-    return pd.concat(dfs)
+    matches = pd.concat(dfs, ignore_index=True)
+    matches['date'] = pd.to_datetime(matches['date'])
+    return matches
