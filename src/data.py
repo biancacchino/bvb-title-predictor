@@ -7,15 +7,15 @@ CURRENT_SEASON = 2026
 
 def full_time_score(match):
     for result in match['matchResults']:
-        # 2 is the score after full time, 1 is halftime
-        if result['resultTypeID'] == 2:
+        # match by name: the type ID is 0 for every result up to 2007 and 2 for full time after
+        if result['resultName'] == 'Endergebnis':
             return result['pointsTeam1'], result['pointsTeam2']
-    return None, None   
+    return None, None
 
 def fetch_season(year):
-    r   = requests.get(f'https://api.openligadb.de/getmatchdata/bl1/{year}', timeout=10)
-    r.raise_for_status()
-    matches = r.json()
+    response = requests.get(f'https://api.openligadb.de/getmatchdata/bl1/{year}', timeout=10)
+    response.raise_for_status()
+    matches = response.json()
     rows = []
     for match in matches:
         home_goals, away_goals = full_time_score(match)
@@ -29,8 +29,8 @@ def fetch_season(year):
             'away_goals': away_goals,
             'finished': match['matchIsFinished']
         })
-        match_1_to_34 = match['group']['groupOrderID'] <= 34
     df = pd.DataFrame(rows)
+    # drop the 2008 relegation playoff, only matchdays 1-34 are league matches
     return df[df['matchday'] <= 34]
 
 
@@ -45,7 +45,8 @@ def load_season(year):
         df.to_csv(path,index=False)
         return df
 
-def load_all(start=2003, end=CURRENT_SEASON):
+# 2003 only has results for 20 of 306 matches in the API, so history starts in 2004
+def load_all(start=2004, end=CURRENT_SEASON):
     # an empty list, append each load_season , then pd.concat and no yield
     dfs = []
     for year in range(start, end+1):
@@ -53,4 +54,8 @@ def load_all(start=2003, end=CURRENT_SEASON):
         dfs.append(load_season(year))
     matches = pd.concat(dfs, ignore_index=True)
     matches['date'] = pd.to_datetime(matches['date'])
+    # a finished match without a score breaks every feature after it, so stop here
+    missing_scores = matches[matches.finished & matches.home_goals.isna()]
+    if len(missing_scores) > 0:
+        raise ValueError(f'{len(missing_scores)} finished matches have no score, seasons {sorted(missing_scores.season.unique().tolist())}')
     return matches
