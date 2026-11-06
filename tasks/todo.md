@@ -13,10 +13,10 @@ Commits, pushes and PRs wait for approval.
 - Verify: no missing form values in 7038 rows, and BVB's 2020 numbers match a hand calculation.
 
 ## Step 3: match model (`src/model.py`)
-- [ ] Two Poisson regressions (scikit-learn `PoissonRegressor`), one for home goals and one for away goals.
-- [ ] Features: Elo difference, home form, away form.
-- [ ] Train on finished matches only.
-- [ ] `predict_goals(model, matches)` returns expected home and away goals per match.
+- [x] Two Poisson regressions (scikit-learn `PoissonRegressor`), one for home goals and one for away goals.
+- [x] Features: Elo difference, home form, away form.
+- [x] Train on finished matches only.
+- [x] `predict_goals(model, matches)` returns expected home and away goals per match.
 - Verify: the average predicted goals are close to the real averages (about 1.6 home, 1.3 away), and the stronger team gets more expected goals.
 
 ## Step 4: Monte Carlo (`src/simulate.py`)
