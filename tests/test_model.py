@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from src.model import train, predict_goals
+from src.model import draw_probability, fit_draw_weight, train, predict_goals
 
 def make_matches(number_of_matches, elo_effect, random_seed=0):
     # fake matches where goals come from a known formula, so we know what the model should find
@@ -45,3 +45,14 @@ def test_train_skips_unplayed_matches():
     unplayed = matches.head(10).assign(finished=False, home_goals=np.nan, away_goals=np.nan)
     # would crash on NaN goals if unplayed matches were used for training
     train(pd.concat([matches, unplayed], ignore_index=True))
+
+def test_draw_weight_matches_the_observed_draw_rate():
+    expected_home_goals = np.array([1.5, 1.2, 1.8, 1.0])
+    expected_away_goals = np.array([1.2, 1.1, 1.0, 1.3])
+    home_goals = np.array([0, 1, 2, 0])
+    away_goals = np.array([0, 1, 1, 0])  # three draws from four matches
+
+    weight = fit_draw_weight(expected_home_goals, expected_away_goals, home_goals, away_goals)
+    base = draw_probability(expected_home_goals, expected_away_goals)
+    calibrated = np.mean(weight * base / (1 - base + weight * base))
+    assert calibrated == pytest.approx(0.75)

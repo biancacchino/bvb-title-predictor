@@ -32,8 +32,8 @@ flowchart TD
 2. **Features**: `src/features.py` gives every match two numbers per team, from before kickoff only:
    - **Elo rating**: long-term strength that goes up when a team beats expectations.
    - **Form**: average points over the last 5 matches.
-3. **Match model**: `src/model.py` fits two Poisson regressions that predict the expected goals for the home team and the away team.
-4. **Simulation**: `src/simulate.py` plays every remaining match 10,000 times with random scores from the match model, and counts how often each team finishes first.
+3. **Match model**: `src/model.py` fits two Poisson regressions that predict the expected goals for the home team and the away team. It also learns a small correction for the league-wide draw rate.
+4. **Simulation**: `src/simulate.py` plays every remaining match 10,000 times with random scores from the match model, including the calibrated draw rate, and counts how often each team finishes first.
 5. **Backtest**: `src/backtest.py` predicts every past season from 2008 to 2025 using only what was known at the time, and tunes the Elo settings.
 
 The approach is a match model plus a simulation, not one classifier per team-season.
@@ -125,7 +125,6 @@ You need Python 3.10 or later.
 
 - **No transfers**: the model only knows results, so a star signing shows up only after a few matches. Early-season predictions are the weakest.
 - **Frozen ratings**: ratings don't change inside a simulated season, so the chances are probably a bit too confident.
-- **Too few draws**: the match model predicts about 22% draws, while the real rate is about 25%.
 - **Partial tiebreaks**: ties are broken by points, goal difference and goals scored. Head-to-head is skipped.
 - **History starts in 2004**: OpenLigaDB only has results for 20 of the 306 matches in 2003.
 

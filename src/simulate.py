@@ -5,6 +5,22 @@ from src.model import predict_goals
 
 NUMBER_OF_SIMULATIONS = 10000
 
+def sample_scores(expected_home_goals, expected_away_goals, number_of_simulations, random, draw_weight):
+    # Sample independent Poisson scores, then accept draws more or less often than decisive
+    # results. This gives every draw a relative probability of draw_weight while preserving
+    # the relative probabilities of all scorelines within each group.
+    shape = (number_of_simulations, len(expected_home_goals))
+    home_goals = np.empty(shape, dtype=int)
+    away_goals = np.empty(shape, dtype=int)
+    redraw = np.ones(shape, dtype=bool)
+    while redraw.any():
+        home_goals[redraw] = random.poisson(np.broadcast_to(expected_home_goals, shape)[redraw])
+        away_goals[redraw] = random.poisson(np.broadcast_to(expected_away_goals, shape)[redraw])
+        acceptance = np.where(home_goals[redraw] == away_goals[redraw], draw_weight, 1) / max(draw_weight, 1)
+        redraw[redraw] = random.random(redraw.sum()) >= acceptance
+
+    return home_goals, away_goals
+
 def simulate_season(season_matches, models, number_of_simulations=NUMBER_OF_SIMULATIONS, random_seed=None):
     # Play every unplayed match of one season many times and return each team's title probability.
     # Simplification: ratings stay frozen inside a simulated season, so a team on a simulated
@@ -19,8 +35,10 @@ def simulate_season(season_matches, models, number_of_simulations=NUMBER_OF_SIMU
     if unplayed.any():
         expected_home_goals, expected_away_goals = predict_goals(models, season_matches[unplayed])
         random = np.random.default_rng(random_seed)
-        home_goals[:, unplayed] = random.poisson(expected_home_goals, (number_of_simulations, unplayed.sum()))
-        away_goals[:, unplayed] = random.poisson(expected_away_goals, (number_of_simulations, unplayed.sum()))
+        _, _, draw_weight = models
+        home_goals[:, unplayed], away_goals[:, unplayed] = sample_scores(
+            expected_home_goals, expected_away_goals, number_of_simulations, random, draw_weight
+        )
 
     # 1 where a team is the home (or away) side of a match, so a matrix product adds
     # every match's points and goals to the right team in all simulations at once
