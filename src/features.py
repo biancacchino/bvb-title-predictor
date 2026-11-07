@@ -64,39 +64,33 @@ def add_elo(matches):
     return matches
 
 
-def match_points(goals_for, goals_against, finished):
-    # NaN for unplayed matches, so they don't count as losses
-    points = (goals_for > goals_against) * 3 + (goals_for == goals_against) * 1
-    return points.where(finished)
+def match_points(goals_for, goals_against):
+    return (goals_for > goals_against) * 3 + (goals_for == goals_against)
 
 def add_form(matches):
     # Return a copy of matches with home_form_before and away_form_before:
     # average points over each team's last 5 finished matches, home and away together.
-    matches = matches.copy()
     matches = matches.sort_values('date').reset_index(drop=True)
 
-    # one row per team per match, so a team's home and away matches line up in date order
+    # one row per team per match, so a team's home and away matches line up in date order.
+    # Unplayed matches get NaN points, so they don't count as losses.
     home_rows = pd.DataFrame({
         'match_index': matches.index,
         'side': 'home',
-        'date': matches.date,
         'team': matches.home_team,
-        'points': match_points(matches.home_goals, matches.away_goals, matches.finished),
-        'finished': matches.finished,
+        'points': match_points(matches.home_goals, matches.away_goals).where(matches.finished),
     })
     away_rows = pd.DataFrame({
         'match_index': matches.index,
         'side': 'away',
-        'date': matches.date,
         'team': matches.away_team,
-        'points': match_points(matches.away_goals, matches.home_goals, matches.finished),
-        'finished': matches.finished,
+        'points': match_points(matches.away_goals, matches.home_goals).where(matches.finished),
     })
-    team_matches = pd.concat([home_rows, away_rows], ignore_index=True)
-    team_matches = team_matches.sort_values(['date', 'match_index'], kind='stable')
+    # matches is sorted by date, so match_index order is date order
+    team_matches = pd.concat([home_rows, away_rows], ignore_index=True).sort_values('match_index', kind='stable')
 
     # form after each finished match, including that match
-    finished_rows = team_matches[team_matches.finished]
+    finished_rows = team_matches[team_matches.points.notna()]
     team_matches['form_after'] = (
         finished_rows
         .groupby('team')
@@ -104,11 +98,13 @@ def add_form(matches):
         .transform(lambda team_points: team_points.rolling(FORM_WINDOW, min_periods=1).mean())
     )
 
-    # shift by one match so a match never sees its own result (no leakage),
-    # then fill forward so unplayed matches get the latest known form
-    team_matches['form_before'] = team_matches.groupby('team').form_after.shift(1)
-    team_matches['form_before'] = team_matches.groupby('team').form_before.ffill()
-    team_matches['form_before'] = team_matches.form_before.fillna(FIRST_MATCH_FORM)
+    # fill forward so unplayed matches get the latest known form,
+    # then shift by one match so a match never sees its own result (no leakage)
+    team_matches['form_before'] = (
+        team_matches.groupby('team').form_after
+        .transform(lambda form: form.ffill().shift())
+        .fillna(FIRST_MATCH_FORM)
+    )
 
     form_by_side = team_matches.pivot(index='match_index', columns='side', values='form_before')
     matches['home_form_before'] = form_by_side['home']

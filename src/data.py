@@ -39,11 +39,10 @@ def load_season(year):
     path = DATA_DIR / f'{year}.csv'
     if path.exists() and year!=CURRENT_SEASON:
         return pd.read_csv(path)
-    else: # fetch -> mkdir -> save -> return
-        df = fetch_season(year)
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
-        df.to_csv(path,index=False)
-        return df
+    df = fetch_season(year)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, index=False)
+    return df
 
 # 2003 only has results for 20 of 306 matches in the API, so history starts in 2004
 def load_all(start=2004, end=CURRENT_SEASON):
