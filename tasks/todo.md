@@ -46,3 +46,10 @@ Commits, pushes and PRs wait for approval.
 - [x] Fit one global draw weight in `train` so the predicted draw rate matches the training data.
 - [x] Sample simulated scores with that weight.
 - Verify: held-out draw rate 24.6% (was 22.6%, real 24.6%), title Brier unchanged (0.2711 vs 0.2708).
+
+## Step 8: ratings update inside the simulation (tested, dropped)
+- [x] Spike: each simulation updates Elo after every simulated matchday, form stays frozen.
+- [x] Current season: Bayern 85.0% -> 79.0%, BVB 13.2% -> 16.1%.
+- [x] Backtest Brier: 0.2711 frozen vs 0.2723 updating (worse at matchdays 0, 9 and 25, better at 17). The real champion's average chance fell from 73% to 69%.
+- [x] Seed check (5 seeds): updating is worse on every seed (Brier +0.0007 to +0.0044, average +0.0023) and in 13 of 18 seasons (sign test p = 0.10). It is better in 2008, 2010, 2011 and 2023, the seasons a non-Bayern team won.
+- Decision: dropped, because the rule was "keep only if the Brier score is not worse". Frozen ratings stay, and the README now says it was tested.

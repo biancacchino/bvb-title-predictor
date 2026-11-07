@@ -24,7 +24,8 @@ def sample_scores(expected_home_goals, expected_away_goals, number_of_simulation
 def simulate_season(season_matches, models, number_of_simulations=NUMBER_OF_SIMULATIONS, random_seed=None):
     # Play every unplayed match of one season many times and return each team's title probability.
     # Simplification: ratings stay frozen inside a simulated season, so a team on a simulated
-    # winning run does not get stronger. This makes the outcomes a little less spread out than reality.
+    # winning run does not get stronger. Updating ratings per simulated matchday was tested: the backtest
+    # was slightly worse on all 5 seeds (Brier +0.002 on average), but better when a non-Bayern team won.
     teams = np.array(sorted(set(season_matches.home_team) | set(season_matches.away_team)))
     unplayed = ~season_matches.finished.to_numpy()
 

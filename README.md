@@ -124,7 +124,7 @@ You need Python 3.10 or later.
 ## Limitations
 
 - **No transfers**: the model only knows results, so a star signing shows up only after a few matches. Early-season predictions are the weakest.
-- **Frozen ratings**: ratings don't change inside a simulated season, so the chances are probably a bit too confident.
+- **Frozen ratings**: ratings don't change inside a simulated season. I tested updating them after every simulated matchday. Over 5 random seeds the backtest was slightly worse every time (Brier +0.002 on average, worse in 13 of 18 seasons), so the ratings stay frozen. Updating did better in the seasons someone other than Bayern won (Wolfsburg 2008-09, BVB 2010-11 and 2011-12, Leverkusen 2023-24), so frozen ratings may underrate a team chasing Bayern.
 - **Partial tiebreaks**: ties are broken by points, goal difference and goals scored. Head-to-head is skipped.
 - **History starts in 2004**: OpenLigaDB only has results for 20 of the 306 matches in 2003.
 
