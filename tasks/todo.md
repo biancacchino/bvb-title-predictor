@@ -38,6 +38,11 @@ Commits, pushes and PRs wait for approval.
 - [x] README: how it works, how to run it, results.
 
 ## Housekeeping
-- [ ] Clear notebook outputs before committing (they add about 47k lines to the diff). Kept out of git for now, as asked.
+- [x] Clear notebook outputs (done with `jupyter nbconvert --clear-output`, not committed yet).
 - [x] Remove the dead `match_1_to_34` line in `src/data.py` (done in the 2004-2007 score fix, PR #3).
 - [x] Update the ML vault after each step.
+
+## Step 7: draw calibration
+- [x] Fit one global draw weight in `train` so the predicted draw rate matches the training data.
+- [x] Sample simulated scores with that weight.
+- Verify: held-out draw rate 24.6% (was 22.6%, real 24.6%), title Brier unchanged (0.2711 vs 0.2708).

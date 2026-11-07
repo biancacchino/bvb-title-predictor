@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from src.simulate import simulate_season
+from src.simulate import sample_scores, simulate_season
 
 class ConstantModel:
     # stands in for a trained model: every team scores the same number of goals on average
@@ -14,7 +14,7 @@ class ConstantModel:
     def predict(self, features):
         return np.full(len(features), self.average_goals)
 
-EQUAL_TEAMS = (ConstantModel(1.4), ConstantModel(1.4))
+EQUAL_TEAMS = (ConstantModel(1.4), ConstantModel(1.4), 1.0)
 
 def make_season(rows):
     # rows are (home_team, away_team, home_goals, away_goals), None goals = unplayed
@@ -62,3 +62,8 @@ def test_same_seed_gives_the_same_result():
     first = simulate_season(season, EQUAL_TEAMS, number_of_simulations=500, random_seed=7)
     second = simulate_season(season, EQUAL_TEAMS, number_of_simulations=500, random_seed=7)
     assert first.equals(second)
+
+def test_draw_weight_increases_the_simulated_draw_rate():
+    random = np.random.default_rng(0)
+    home_goals, away_goals = sample_scores(np.array([1.4]), np.array([1.4]), 20000, random, draw_weight=1.5)
+    assert (home_goals == away_goals).mean() == pytest.approx(0.34, abs=0.015)
