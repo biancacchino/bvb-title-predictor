@@ -16,6 +16,18 @@ The numbers move by a few tenths of a percent between runs, because the simulati
 
 ## How it works
 
+```mermaid
+flowchart TD
+    api[OpenLigaDB API] --> data
+    data["<b>1. Data</b><br>src/data.py<br>7,038 matches since 2004"] --> features
+    features["<b>2. Features</b><br>src/features.py<br>Elo rating and last-5 form"] --> model
+    model["<b>3. Match model</b><br>src/model.py<br>expected goals per match"] --> simulate
+    simulate["<b>4. Simulation</b><br>src/simulate.py<br>rest of the season, 10,000 times"] --> result
+    result["<b>Title chances</b><br>main.py prints them and draws the chart"]
+    simulate -. 2008-2025 replayed .-> backtest
+    backtest["<b>5. Backtest</b><br>src/backtest.py<br>Brier score"] -. tuned Elo settings .-> features
+```
+
 1. **Data**: `src/data.py` downloads every Bundesliga match since 2004 from [OpenLigaDB](https://www.openligadb.de) and caches each season as a CSV file.
 2. **Features**: `src/features.py` gives every match two numbers per team, from before kickoff only:
    - **Elo rating**: long-term strength that goes up when a team beats expectations.
@@ -43,6 +55,33 @@ The baseline gives 100% to the current leader, or to last season's champion at m
 - The model beats the baseline at every point in the season.
 - Its percentages are mostly honest: predictions of about 13% came true 13% of the time, and predictions of about 85% came true 90% of the time.
 - On goals, it is about 10% better than always predicting the league average, and it picks the right result (win, draw or loss) 52% of the time.
+
+### Prediction history
+
+This is what the model predicted at the halfway point (matchday 17) of every season, using only the first half of that season and the seasons before it.
+Its favourite won 15 of the 18 titles.
+A miss means another team was the favourite.
+
+| Season | Champion | Model at halfway |
+|---|---|---|
+| 2008-09 | Wolfsburg | 0% (miss) |
+| 2009-10 | Bayern | 51% |
+| 2010-11 | **BVB** | **95%** |
+| 2011-12 | **BVB** | **29%** (miss) |
+| 2012-13 | Bayern | 96% |
+| 2013-14 | Bayern | 100% |
+| 2014-15 | Bayern | 100% |
+| 2015-16 | Bayern | 99% |
+| 2016-17 | Bayern | 99% |
+| 2017-18 | Bayern | 100% |
+| 2018-19 | Bayern | 52% |
+| 2019-20 | Bayern | 48% |
+| 2020-21 | Bayern | 95% |
+| 2021-22 | Bayern | 99% |
+| 2022-23 | Bayern | 87% |
+| 2023-24 | Leverkusen | 23% (miss) |
+| 2024-25 | Bayern | 73% |
+| 2025-26 | Bayern | 100% |
 
 ## Run it
 
