@@ -39,6 +39,7 @@ def load_season(year):
     path = DATA_DIR / f'{year}.csv'
     if path.exists() and year!=CURRENT_SEASON:
         return pd.read_csv(path)
+    print(f'Downloading {year}')
     df = fetch_season(year)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     df.to_csv(path, index=False)
@@ -49,7 +50,6 @@ def load_all(start=2004, end=CURRENT_SEASON):
     # an empty list, append each load_season , then pd.concat and no yield
     dfs = []
     for year in range(start, end+1):
-        print(f'Loading {year}')
         dfs.append(load_season(year))
     matches = pd.concat(dfs, ignore_index=True)
     matches['date'] = pd.to_datetime(matches['date'])
