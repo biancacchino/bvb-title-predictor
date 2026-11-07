@@ -27,9 +27,9 @@ Commits, pushes and PRs wait for approval.
 - Verify: probabilities add up to 1, and a finished season gives 100% to the real champion.
 
 ## Step 5: backtest (`src/backtest.py`)
-- [ ] For each past season, predict the title from the table at matchday 17, training only on earlier matches.
-- [ ] Score with the Brier score against the real champion.
-- [ ] Small grid search over `K_FACTOR`, `HOME_ADVANTAGE`, `SUMMER_KEEP`, `SECOND_DIVISION_RATING`.
+- [x] For each past season, predict the title from the table at matchday 17, training only on earlier matches.
+- [x] Score with the Brier score against the real champion.
+- [x] Small grid search over `K_FACTOR`, `HOME_ADVANTAGE`, `SUMMER_KEEP`, `SECOND_DIVISION_RATING`.
 - Verify: the model beats a baseline that gives the title to the current leader.
 
 ## Step 6: `main.py`, chart, README
