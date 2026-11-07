@@ -20,10 +20,10 @@ Commits, pushes and PRs wait for approval.
 - Verify: the average predicted goals are close to the real averages (about 1.6 home, 1.3 away), and the stronger team gets more expected goals.
 
 ## Step 4: Monte Carlo (`src/simulate.py`)
-- [ ] Draw goals from a Poisson distribution for every unplayed current-season match, 10,000 times (numpy, vectorized).
-- [ ] Build the table from finished results plus simulated results, with tiebreaks on points, goal difference, then goals scored.
-- [ ] Return the title probability for each team.
-- [ ] Ratings stay frozen inside a simulated season (simplification, noted in code).
+- [x] Draw goals from a Poisson distribution for every unplayed current-season match, 10,000 times (numpy, vectorized).
+- [x] Build the table from finished results plus simulated results, with tiebreaks on points, goal difference, then goals scored.
+- [x] Return the title probability for each team.
+- [x] Ratings stay frozen inside a simulated season (simplification, noted in code).
 - Verify: probabilities add up to 1, and a finished season gives 100% to the real champion.
 
 ## Step 5: backtest (`src/backtest.py`)
