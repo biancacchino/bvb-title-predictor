@@ -118,7 +118,7 @@ You need Python 3.10 or later.
 
 - `main.py`: runs the prediction and draws the chart.
 - `src/`: data, features, match model, simulation and backtest.
-- `tests/`: pytest tests for every step.
+- `tests/`: pytest tests for every step. GitHub Actions runs them on every PR (`.github/workflows/test.yml`).
 - `notebooks/exploration.ipynb`: where each step was explored before moving into `src/`.
 
 ## Limitations
