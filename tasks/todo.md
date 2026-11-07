@@ -33,11 +33,11 @@ Commits, pushes and PRs wait for approval.
 - Verify: the model beats a baseline that gives the title to the current leader.
 
 ## Step 6: `main.py`, chart, README
-- [ ] `python main.py` loads data, trains, simulates, and prints BVB's title chance plus the top 5.
-- [ ] Bar chart of title chances saved to `docs/`.
-- [ ] README: how it works, how to run it, results.
+- [x] `python main.py` loads data, trains, simulates, and prints BVB's title chance plus the top 5.
+- [x] Bar chart of title chances saved to `docs/`.
+- [x] README: how it works, how to run it, results.
 
 ## Housekeeping
-- [ ] Clear notebook outputs before committing (they add about 47k lines to the diff).
+- [ ] Clear notebook outputs before committing (they add about 47k lines to the diff). Kept out of git for now, as asked.
 - [x] Remove the dead `match_1_to_34` line in `src/data.py` (done in the 2004-2007 score fix, PR #3).
-- [ ] Update the ML vault after each step.
+- [x] Update the ML vault after each step.
